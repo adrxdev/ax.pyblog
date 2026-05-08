@@ -1,0 +1,308 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        mono: ['"IBM Plex Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=IBM+Plex+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes scale-x {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: up 0.4s ease both;
+        }
+
+        .fade-up:nth-child(1) { animation-delay: 0.05s }
+        .fade-up:nth-child(2) { animation-delay: 0.12s }
+        .fade-up:nth-child(3) { animation-delay: 0.19s }
+
+        input, textarea, select {
+            outline: none;
+            width: 100%;
+            padding: 0.5rem 0;
+            font-family: inherit;
+            font-size: inherit;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: black;
+        }
+    </style>
+    <title>Profile — Pyblog</title>
+<base target="_blank">
+</head>
+
+<body class="bg-white text-black min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="border-b border-black relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-px bg-black origin-left scale-x-0 animate-[scale-x_0.8s_ease-out_forwards]"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between relative z-10">
+        <a href="/" class="font-serif text-xl italic font-light group relative overflow-hidden inline-block h-[1.2em]">
+            <span class="inline-block transition-transform duration-500 group-hover:-translate-y-full">Pyblog</span>
+            <span class="absolute left-0 top-full inline-block transition-transform duration-500 group-hover:-translate-y-full text-gray-400">Pyblog</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="{% url 'blog_index' %}" class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Home</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Home</span>
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Profile</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Profile</span>
+            </a>
+            <a href="{% url 'blog_create' %}" class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">New Post</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">New Post</span>
+            </a>
+            <a href="{% url 'logout' %}" class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Logout</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Logout</span>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Login</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Login</span>
+            </a>
+            <a href="{% url 'register' %}" class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Register</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Register</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <button id="menu-toggle" class="md:hidden flex flex-col gap-1.5 p-2 relative z-50" aria-label="Toggle menu">
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+        </button>
+
+        <nav id="mobile-menu" class="md:hidden fixed inset-0 top-[61px] bg-white/95 backdrop-blur-sm border-t border-black/10 flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-500 z-40">
+            <a href="{% url 'blog_index' %}" class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Home</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Profile</a>
+            <a href="{% url 'blog_create' %}" class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">New Post</a>
+            <a href="{% url 'logout' %}" class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Login</a>
+            <a href="{% url 'register' %}" class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Register</a>
+            {% endif %}
+        </nav>
+
+        <script>
+            (function() {
+                const toggle = document.getElementById('menu-toggle');
+                const menu = document.getElementById('mobile-menu');
+                const lines = toggle ? toggle.querySelectorAll('.hamburger-line') : [];
+                const links = menu ? menu.querySelectorAll('.mobile-nav-link') : [];
+                let isOpen = false;
+
+                toggle && toggle.addEventListener('click', () => {
+                    isOpen = !isOpen;
+
+                    if (isOpen) {
+                        lines[0].style.transform = 'translateY(3px) rotate(45deg)';
+                        lines[1].style.opacity = '0';
+                        lines[1].style.transform = 'scaleX(0)';
+                        lines[2].style.transform = 'translateY(-3px) rotate(-45deg)';
+
+                        menu.classList.remove('opacity-0', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'pointer-events-auto');
+
+                        links.forEach((link, i) => {
+                            setTimeout(() => {
+                                link.classList.remove('opacity-0', 'translate-y-4');
+                                link.classList.add('opacity-100', 'translate-y-0');
+                            }, 100 + i * 80);
+                        });
+                    } else {
+                        lines[0].style.transform = '';
+                        lines[1].style.opacity = '';
+                        lines[1].style.transform = '';
+                        lines[2].style.transform = '';
+
+                        links.forEach(link => {
+                            link.classList.add('opacity-0', 'translate-y-4');
+                            link.classList.remove('opacity-100', 'translate-y-0');
+                        });
+
+                        setTimeout(() => {
+                            menu.classList.add('opacity-0', 'pointer-events-none');
+                            menu.classList.remove('opacity-100', 'pointer-events-auto');
+                        }, 300);
+                    }
+                });
+            })();
+        </script>
+    </div>
+</header>
+
+    <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-10">
+
+        <!-- Page Title -->
+        <div
+            class="py-10 sm:py-14 lg:py-20 border-b border-black flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <h1 class="font-serif text-5xl sm:text-6xl lg:text-8xl italic font-light leading-[0.9] tracking-tight">
+                Your<br>Profile
+            </h1>
+            <span class="font-mono text-xs text-gray-400">{{ user.username }}</span>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mt-6 sm:mt-8">
+            {% for message in messages %}
+            <div
+                class="fade-up font-mono text-[11px] tracking-wide uppercase border px-4 py-3 mb-3
+                        {% if message.tags == 'success' %}border-black text-black bg-gray-50{% else %}border-red-400 text-red-500{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Profile Card -->
+        <div class="py-10 sm:py-16 flex flex-col items-center">
+
+            <!-- Avatar -->
+            <div class="fade-up flex flex-col items-center mb-8 sm:mb-12">
+                {% if user.profile.photo %}
+                <img src="{{ user.profile.photo.url }}" alt="Profile photo"
+                    class="w-24 h-24 sm:w-28 sm:h-28 object-cover border border-black rounded-full mb-4">
+                {% else %}
+                <div
+                    class="w-24 h-24 sm:w-28 sm:h-28 border border-black rounded-full flex items-center justify-center mb-4 bg-gray-50">
+                    <span class="font-serif text-3xl sm:text-4xl italic font-light text-gray-300">
+                        {{ user.username|slice:":1"|upper }}
+                    </span>
+                </div>
+                {% endif %}
+                <p class="font-serif text-2xl sm:text-3xl italic font-light text-center px-4">
+                    {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+                </p>
+                <p class="font-mono text-[10px] sm:text-[11px] text-gray-400 tracking-widest uppercase mt-1 text-center px-4">{{ user.email }}</p>
+            </div>
+
+            <!-- Divider -->
+            <div class="w-full max-w-xl border-t border-gray-100 mb-8 sm:mb-12"></div>
+
+            <!-- Form -->
+            <form method="post" enctype="multipart/form-data" class="w-full max-w-xl space-y-6 sm:space-y-8 fade-up">
+                {% csrf_token %}
+
+                <!-- Photo Upload -->
+                <div>
+                    <label for="{{ form.photo.id_for_label }}"
+                        class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">
+                        Profile Photo
+                    </label>
+                    <input type="file" name="{{ form.photo.html_name }}" id="{{ form.photo.id_for_label }}"
+                        class="block w-full font-mono text-[11px] text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-mono file:tracking-widest file:uppercase file:bg-black file:text-white hover:file:bg-gray-800 file:cursor-pointer file:transition-colors">
+                    {% if form.photo.errors %}
+                    <p class="mt-2 font-mono text-[10px] text-red-500 uppercase tracking-wide">{{ form.photo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Two-col: First / Last name -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}"
+                            class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">
+                            First Name
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <p class="mt-2 font-mono text-[10px] text-red-500 uppercase tracking-wide">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}"
+                            class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">
+                            Last Name
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <p class="mt-2 font-mono text-[10px] text-red-500 uppercase tracking-wide">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}"
+                        class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">
+                        Email
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <p class="mt-2 font-mono text-[10px] text-red-500 uppercase tracking-wide">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-gray-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button type="submit"
+                        class="font-mono text-[11px] tracking-widest uppercase rounded-full border border-black px-8 py-3 hover:bg-black hover:text-white transition-colors duration-200 w-full sm:w-auto">
+                        Save changes →
+                    </button>
+                    <span class="font-mono text-[10px] text-gray-300 uppercase tracking-wide">
+                        Member since {% now "Y" %}
+                    </span>
+                </div>
+            </form>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-black mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span class="font-serif italic text-sm text-gray-400">Text with AX</span>
+            <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">Pyblog made with Django</span>
+        </div>
+    </footer>
+
+</body>
+
+</html>

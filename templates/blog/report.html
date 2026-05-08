@@ -1,0 +1,468 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        mono: ['"IBM Plex Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=IBM+Plex+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes scale-x {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-wrap {
+            animation: up 0.35s ease both;
+            animation-delay: 0.05s;
+        }
+
+        input, textarea, select {
+            outline: none;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 0.5rem 0;
+            font-family: inherit;
+            font-size: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: black;
+        }
+
+        .reason-card input[type="radio"]:checked ~ .card-body {
+            border-color: black;
+        }
+
+        .reason-card input[type="radio"]:checked ~ .card-body .card-dot {
+            background: black;
+        }
+
+        @media (min-width: 768px) {
+            .desktop-nav {
+                display: flex !important;
+            }
+            .mobile-toggle {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .desktop-nav {
+                display: none !important;
+            }
+            .mobile-toggle {
+                display: flex !important;
+            }
+        }
+    </style>
+
+    <title>Report Post — Pyblog</title>
+<base target="_blank">
+</head>
+
+<body class="bg-white text-black min-h-screen flex flex-col">
+
+    <!-- Notifications -->
+    {% if messages %}
+    <div id="notif-container" class="fixed top-5 right-5 z-[9999] space-y-3">
+
+        {% for message in messages %}
+        <div class="notif-item bg-white border border-black shadow-sm px-5 py-4 min-w-[300px] animate-[up_.3s_ease]">
+
+            <div class="flex items-start justify-between gap-4">
+
+                <div>
+                    <span class="font-mono text-[10px] uppercase tracking-widest text-gray-400 block mb-1">
+                        Notification
+                    </span>
+
+                    <p class="font-serif italic text-lg">
+                        {{ message }}
+                    </p>
+                </div>
+
+                <button onclick="this.parentElement.parentElement.remove()"
+                    class="font-mono text-xs text-gray-400 hover:text-black transition-colors">
+                    ✕
+                </button>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+    {% endif %}
+
+    <!-- HEADER -->
+    <header class="border-b border-black relative z-50">
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between">
+
+            <!-- Logo with hover slide -->
+            <a href="/" class="font-serif text-xl italic font-light group relative overflow-hidden inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-500 group-hover:-translate-y-full">Pyblog</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-500 group-hover:-translate-y-full text-gray-400">Pyblog</span>
+            </a>
+
+            <!-- Desktop nav -->
+            <nav class="desktop-nav items-center gap-8">
+
+                <a href="{% url 'blog_index' %}"
+                    class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                    <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Home</span>
+                    <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Home</span>
+                </a>
+
+                {% if user.is_authenticated %}
+
+                <a href="{% url 'profile' %}"
+                    class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                    <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Profile</span>
+                    <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Profile</span>
+                </a>
+
+                <a href="{% url 'blog_create' %}"
+                    class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                    <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">New Post</span>
+                    <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">New Post</span>
+                </a>
+
+                <a href="{% url 'logout' %}"
+                    class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                    <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Logout</span>
+                    <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Logout</span>
+                </a>
+
+                {% else %}
+
+                <a href="{% url 'login' %}"
+                    class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                    <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Login</span>
+                    <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Login</span>
+                </a>
+
+                <a href="{% url 'register' %}"
+                    class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                    <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Register</span>
+                    <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Register</span>
+                </a>
+
+                {% endif %}
+
+            </nav>
+
+            <!-- Mobile hamburger button -->
+            <button id="menu-toggle" class="mobile-toggle flex-col gap-1.5 p-2 relative z-50" aria-label="Toggle menu">
+                <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+                <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300"></span>
+                <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+            </button>
+
+            <!-- Mobile dropdown -->
+            <nav id="mobile-menu"
+                class="md:hidden fixed inset-0 top-[61px] bg-white/95 backdrop-blur-sm border-t border-black/10 flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-500 z-40">
+                <a href="{% url 'blog_index' %}"
+                    class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40"
+                    style="opacity: 0; transform: translateY(1rem); transition: opacity 0.3s, transform 0.3s;">Home</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}"
+                    class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40"
+                    style="opacity: 0; transform: translateY(1rem); transition: opacity 0.3s, transform 0.3s;">Profile</a>
+                <a href="{% url 'blog_create' %}"
+                    class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40"
+                    style="opacity: 0; transform: translateY(1rem); transition: opacity 0.3s, transform 0.3s;">New Post</a>
+                <a href="{% url 'logout' %}"
+                    class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40"
+                    style="opacity: 0; transform: translateY(1rem); transition: opacity 0.3s, transform 0.3s;">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}"
+                    class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40"
+                    style="opacity: 0; transform: translateY(1rem); transition: opacity 0.3s, transform 0.3s;">Login</a>
+                <a href="{% url 'register' %}"
+                    class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40"
+                    style="opacity: 0; transform: translateY(1rem); transition: opacity 0.3s, transform 0.3s;">Register</a>
+                {% endif %}
+            </nav>
+
+            <script>
+                (function() {
+                    const toggle = document.getElementById('menu-toggle');
+                    const menu = document.getElementById('mobile-menu');
+                    const lines = toggle.querySelectorAll('.hamburger-line');
+                    const links = menu.querySelectorAll('.mobile-nav-link');
+                    let isOpen = false;
+
+                    toggle.addEventListener('click', () => {
+                        isOpen = !isOpen;
+
+                        if (isOpen) {
+                            lines[0].style.transform = 'translateY(3px) rotate(45deg)';
+                            lines[1].style.opacity = '0';
+                            lines[1].style.transform = 'scaleX(0)';
+                            lines[2].style.transform = 'translateY(-3px) rotate(-45deg)';
+
+                            menu.style.opacity = '1';
+                            menu.style.pointerEvents = 'auto';
+
+                            links.forEach((link, i) => {
+                                setTimeout(() => {
+                                    link.style.opacity = '1';
+                                    link.style.transform = 'translateY(0)';
+                                }, 100 + i * 80);
+                            });
+                        } else {
+                            lines[0].style.transform = '';
+                            lines[1].style.opacity = '';
+                            lines[1].style.transform = '';
+                            lines[2].style.transform = '';
+
+                            links.forEach(link => {
+                                link.style.opacity = '0';
+                                link.style.transform = 'translateY(1rem)';
+                            });
+
+                            setTimeout(() => {
+                                menu.style.opacity = '0';
+                                menu.style.pointerEvents = 'none';
+                            }, 300);
+                        }
+                    });
+                })();
+            </script>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-10">
+
+        <!-- Title -->
+        <div
+            class="py-10 sm:py-14 lg:py-20 border-b border-black flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+
+            <h1 class="font-serif text-5xl sm:text-6xl lg:text-8xl italic font-light leading-[0.9] tracking-tight">
+                Report<br>Post
+            </h1>
+
+            <span class="font-mono text-xs text-gray-400">
+                Help keep Pyblog safe
+            </span>
+
+        </div>
+
+        <!-- Form -->
+        <div class="form-wrap max-w-lg py-10 sm:py-14 lg:py-20">
+
+            <!-- Post -->
+            <div class="mb-10 p-5 border border-gray-200">
+
+                <span class="font-mono text-[10px] uppercase tracking-widest text-gray-400 block mb-1">
+                    Reporting
+                </span>
+
+                <p class="font-serif text-xl italic font-light">
+                    {{ post.title }}
+                </p>
+
+                <span class="font-mono text-[10px] text-gray-400">
+                    by {{ post.author }}
+                </span>
+
+            </div>
+
+            <form method="POST" class="space-y-8">
+
+                {% csrf_token %}
+
+                <!-- Reason -->
+                <div>
+
+                    <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400 block mb-4">
+                        Reason
+                    </span>
+
+                    <div class="space-y-3">
+
+                        {% for value, label in form.reason.field.choices %}
+
+                        <label class="reason-card block cursor-pointer">
+
+                            <input type="radio" name="reason" value="{{ value }}" class="sr-only" {% if forloop.first %}checked{% endif %}>
+
+                            <div
+                                class="card-body flex items-center gap-4 border border-gray-200 px-5 py-4 hover:border-gray-400 transition-all duration-300">
+
+                                <div
+                                    class="card-dot w-2 h-2 rounded-full border border-gray-400 flex-shrink-0 transition-all duration-300">
+                                </div>
+
+                                <span class="font-mono text-xs uppercase tracking-widest">
+                                    {{ label }}
+                                </span>
+
+                            </div>
+
+                        </label>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <!-- Details -->
+                <div
+                    class="border-b border-gray-200 hover:border-gray-400 focus-within:border-black transition-all duration-300">
+
+                    <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400 block mb-1">
+                        Additional Details
+                    </span>
+
+                    <textarea name="details" rows="4"
+                        class="w-full py-2 font-light text-xs bg-transparent text-black placeholder-gray-300 resize-none"
+                        placeholder="Describe the issue..."></textarea>
+
+                </div>
+
+                <!-- Warning -->
+                <div class="flex gap-3 p-4 border border-gray-200 bg-gray-50">
+
+                    <span class="font-mono text-[10px] text-gray-400 leading-relaxed uppercase tracking-wide">
+                        ⚠ False reports may result in account suspension.
+                    </span>
+
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pt-2">
+
+                    <button type="submit"
+                        class="font-mono text-[11px] tracking-widest uppercase border border-black px-8 py-3 hover:bg-black hover:text-white transition-all duration-300 w-full sm:w-auto">
+
+                        Submit Report →
+
+                    </button>
+
+                    <a href="{% url 'blog_detail' post.pk %}"
+                        class="font-mono text-[11px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors duration-300">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <footer class="border-t border-black mt-auto">
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+
+            <span class="font-serif italic text-sm text-gray-500">
+                ax.devs
+            </span>
+
+            <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">
+                To make school year fun!!
+            </span>
+
+        </div>
+
+    </footer>
+
+    <script>
+
+        // reason cards
+        document.querySelectorAll('.reason-card input[type="radio"]').forEach(radio => {
+
+            radio.addEventListener('change', () => {
+
+                document.querySelectorAll('.card-body').forEach(c => {
+                    c.style.borderColor = '';
+                });
+
+                document.querySelectorAll('.card-dot').forEach(d => {
+                    d.style.background = '';
+                });
+
+                if (radio.checked) {
+                    radio.nextElementSibling.style.borderColor = 'black';
+                    radio.nextElementSibling.querySelector('.card-dot').style.background = 'black';
+                }
+
+            });
+
+        });
+
+        // init first card
+        const first = document.querySelector('.reason-card input[type="radio"]');
+
+        if (first) {
+            first.nextElementSibling.style.borderColor = 'black';
+            first.nextElementSibling.querySelector('.card-dot').style.background = 'black';
+        }
+
+        // auto remove notification
+        setTimeout(() => {
+
+            document.querySelectorAll('.notif-item').forEach(el => {
+
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(-10px)';
+                el.style.transition = 'all .4s ease';
+
+                setTimeout(() => {
+                    el.remove();
+                }, 400);
+
+            });
+
+        }, 3500);
+
+    </script>
+
+</body>
+
+</html>

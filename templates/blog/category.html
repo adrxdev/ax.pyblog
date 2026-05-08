@@ -1,0 +1,289 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        mono: ['"IBM Plex Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=IBM+Plex+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes scale-x {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        .post-row {
+            animation: up 0.35s ease both;
+        }
+
+        .post-row:nth-child(1) { animation-delay: 0.05s }
+        .post-row:nth-child(2) { animation-delay: 0.10s }
+        .post-row:nth-child(3) { animation-delay: 0.15s }
+        .post-row:nth-child(4) { animation-delay: 0.20s }
+        .post-row:nth-child(5) { animation-delay: 0.25s }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .img-wrap {
+            overflow: hidden;
+        }
+
+        .img-wrap img {
+            transition: transform 0.6s ease;
+        }
+
+        .post-row:hover .img-wrap img {
+            transform: scale(1.05);
+        }
+    </style>
+    <title>{{ category }} | Pyblog</title>
+</head>
+
+<body class="bg-white text-black min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="border-b border-black relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-px bg-black origin-left scale-x-0 animate-[scale-x_0.8s_ease-out_forwards]"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between relative z-10">
+        <a href="/" class="font-serif text-xl italic font-light group relative overflow-hidden inline-block h-[1.2em]">
+        <a href="/" class="font-serif text-xl italic font-light group relative overflow-hidden inline-block h-[1.2em]">
+            <span class="inline-block transition-transform duration-500 group-hover:-translate-y-full">Pyblog</span>
+            <span class="absolute left-0 top-full inline-block transition-transform duration-500 group-hover:-translate-y-full text-gray-400">Pyblog</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="{% url 'blog_index' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Home</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Home</span>
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Profile</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Profile</span>
+            </a>
+            <a href="{% url 'blog_create' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">New Post</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">New Post</span>
+            </a>
+            <a href="{% url 'logout' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Logout</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Logout</span>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Login</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Login</span>
+            </a>
+            <a href="{% url 'register' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Register</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Register</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <!-- Mobile hamburger button -->
+        <button id="menu-toggle" class="md:hidden flex flex-col gap-1.5 p-2 relative z-50" aria-label="Toggle menu">
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+        </button>
+
+        <!-- Mobile dropdown -->
+        <nav id="mobile-menu"
+            class="md:hidden fixed inset-0 top-[61px] bg-white/95 backdrop-blur-sm border-t border-black/10 flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-500 z-40">
+            <a href="{% url 'blog_index' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Home</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Profile</a>
+            <a href="{% url 'blog_create' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">New Post</a>
+            <a href="{% url 'logout' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Login</a>
+            <a href="{% url 'register' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Register</a>
+            {% endif %}
+        </nav>
+
+        <script>
+            (function() {
+                const toggle = document.getElementById('menu-toggle');
+                const menu = document.getElementById('mobile-menu');
+                const lines = toggle.querySelectorAll('.hamburger-line');
+                const links = menu.querySelectorAll('.mobile-nav-link');
+                let isOpen = false;
+
+                toggle.addEventListener('click', () => {
+                    isOpen = !isOpen;
+
+                    if (isOpen) {
+                        lines[0].style.transform = 'translateY(3px) rotate(45deg)';
+                        lines[1].style.opacity = '0';
+                        lines[1].style.transform = 'scaleX(0)';
+                        lines[2].style.transform = 'translateY(-3px) rotate(-45deg)';
+
+                        menu.classList.remove('opacity-0', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'pointer-events-auto');
+
+                        links.forEach((link, i) => {
+                            setTimeout(() => {
+                                link.classList.remove('opacity-0', 'translate-y-4');
+                                link.classList.add('opacity-100', 'translate-y-0');
+                            }, 100 + i * 80);
+                        });
+                    } else {
+                        lines[0].style.transform = '';
+                        lines[1].style.opacity = '';
+                        lines[1].style.transform = '';
+                        lines[2].style.transform = '';
+
+                        links.forEach(link => {
+                            link.classList.add('opacity-0', 'translate-y-4');
+                            link.classList.remove('opacity-100', 'translate-y-0');
+                        });
+
+                        setTimeout(() => {
+                            menu.classList.add('opacity-0', 'pointer-events-none');
+                            menu.classList.remove('opacity-100', 'pointer-events-auto');
+                        }, 300);
+                    }
+                });
+            })();
+        </script>
+    </div>
+</header>
+
+    <main class="flex-1 max-w-6xl mx-auto w-full px-6 sm:px-10">
+
+        <!-- Back -->
+        <div class="pt-10">
+            <a href="/"
+                class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors">
+                ← All posts
+            </a>
+        </div>
+
+        {% block page_title %}
+        <div
+            class="py-14 sm:py-20 border-b border-black flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+                <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400 block mb-3">Category</span>
+                <h1 class="font-serif text-6xl sm:text-8xl italic font-light leading-[0.9] tracking-tight">
+                    {{ category }}
+                </h1>
+            </div>
+            <span class="font-mono text-xs text-gray-400">
+                {{ posts|length }} post{{ posts|length|pluralize }}
+            </span>
+        </div>
+        {% endblock page_title %}
+
+        {% block page_content %}
+        <div class="divide-y divide-gray-100">
+            {% for post in posts %}
+            <article class="post-row group">
+                <a href="{% url 'blog_detail' post.pk %}" class="flex items-start gap-6 sm:gap-10 py-7">
+
+                    <!-- Number -->
+                    <span class="font-mono text-[11px] text-gray-300 mt-1 w-6 shrink-0 select-none">
+                        {{ forloop.counter|stringformat:"02d" }}
+                    </span>
+
+                    <!-- Thumbnail -->
+                    <div class="img-wrap w-24 h-16 sm:w-32 sm:h-20 shrink-0 bg-gray-100">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gray-100"></div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Title + excerpt -->
+                    <div class="flex-1 min-w-0">
+                        <h2
+                            class="font-serif text-xl sm:text-2xl italic font-light leading-snug mb-2 group-hover:opacity-40 transition-opacity duration-300">
+                            {{ post.title }}
+                        </h2>
+                        <p class="hidden sm:block text-sm text-gray-400 leading-relaxed line-clamp-2 font-light">
+                            {{ post.body|slice:":160" }}…
+                        </p>
+                    </div>
+
+                    <!-- Meta -->
+                    <div class="hidden md:flex flex-col items-end gap-2 shrink-0 mt-1">
+                        <time class="font-mono text-[11px] text-gray-400">{{ post.created_on.date }}</time>
+                        <div class="flex flex-wrap gap-1 justify-end">
+                            {% for cat in post.categories.all %}
+                            <span
+                                class="font-mono text-[10px] uppercase tracking-wider border px-2 py-0.5 transition-all
+                                {% if cat.name == category %}border-black text-black{% else %}border-gray-200 text-gray-400 group-hover:border-black group-hover:text-black{% endif %}">
+                                {{ cat.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <span
+                        class="font-mono text-gray-300 group-hover:text-black group-hover:translate-x-1 transition-all mt-1 shrink-0 text-sm">→</span>
+                </a>
+            </article>
+            {% empty %}
+            <div class="py-28 text-center font-serif italic text-3xl text-gray-200 font-light">
+                No posts in this category.
+            </div>
+            {% endfor %}
+        </div>
+        {% endblock page_content %}
+
+    </main>
+
+    <footer class="border-t border-black mt-auto">
+        <div class="max-w-6xl mx-auto px-6 sm:px-10 py-5 flex items-center justify-between">
+            <span class="font-serif italic text-sm text-gray-400">Text with AX</span>
+            <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">Pyblog made with Django</span>
+        </div>
+    </footer>
+
+</body>
+
+</html>

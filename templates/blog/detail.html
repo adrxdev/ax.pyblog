@@ -1,0 +1,392 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        mono: ['"IBM Plex Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=IBM+Plex+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes scale-x {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        .fade-in {
+            animation: up 0.4s ease both;
+        }
+
+        .fade-in-2 {
+            animation: up 0.4s 0.1s ease both;
+        }
+
+        .fade-in-3 {
+            animation: up 0.4s 0.2s ease both;
+        }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-body p {
+            margin-bottom: 1.6rem;
+        }
+
+        .post-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .post-body a {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .post-body a:hover {
+            opacity: 0.5;
+        }
+
+        .post-body blockquote {
+            border-left: 2px solid black;
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+        }
+
+        .post-body h2,
+        .post-body h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-weight: 300;
+            margin: 2.5rem 0 1rem;
+        }
+
+        .post-body h2 {
+            font-size: 1.8rem;
+        }
+
+        .post-body h3 {
+            font-size: 1.4rem;
+        }
+
+        .post-body code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85em;
+            background: #f4f4f4;
+            padding: 0.15em 0.4em;
+        }
+
+        .post-body pre {
+            background: #f4f4f4;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .post-body pre code {
+            background: none;
+            padding: 0;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 120px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background: white;
+        }
+
+        textarea:focus {
+            border-color: black;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+
+        .comment-section {
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+        }
+    </style>
+    <title>{{ post.title }} | Pyblog</title>
+</head>
+
+<body class="bg-white text-black min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="border-b border-black relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-px bg-black origin-left scale-x-0 animate-[scale-x_0.8s_ease-out_forwards]"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between relative z-10">
+        <!-- Logo with hover slide -->
+        <a href="/" class="font-serif text-xl italic font-light group relative overflow-hidden inline-block h-[1.2em]">
+            <span class="inline-block transition-transform duration-500 group-hover:-translate-y-full">Pyblog</span>
+            <span class="absolute left-0 top-full inline-block transition-transform duration-500 group-hover:-translate-y-full text-gray-400">Pyblog</span>
+        </a>
+
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="{% url 'blog_index' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Home</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Home</span>
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Profile</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Profile</span>
+            </a>
+            <a href="{% url 'blog_create' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">New Post</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">New Post</span>
+            </a>
+            <a href="{% url 'logout' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Logout</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Logout</span>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Login</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Login</span>
+            </a>
+            <a href="{% url 'register' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Register</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Register</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <!-- Mobile hamburger button -->
+        <button id="menu-toggle" class="md:hidden flex flex-col gap-1.5 p-2 relative z-50" aria-label="Toggle menu">
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+        </button>
+
+        <!-- Mobile dropdown -->
+        <nav id="mobile-menu"
+            class="md:hidden fixed inset-0 top-[61px] bg-white/95 backdrop-blur-sm border-t border-black/10 flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-500 z-40">
+            <a href="{% url 'blog_index' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Home</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Profile</a>
+            <a href="{% url 'blog_create' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">New Post</a>
+            <a href="{% url 'logout' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Login</a>
+            <a href="{% url 'register' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Register</a>
+            {% endif %}
+        </nav>
+
+        <script>
+            (function() {
+                const toggle = document.getElementById('menu-toggle');
+                const menu = document.getElementById('mobile-menu');
+                const lines = toggle.querySelectorAll('.hamburger-line');
+                const links = menu.querySelectorAll('.mobile-nav-link');
+                let isOpen = false;
+
+                toggle.addEventListener('click', () => {
+                    isOpen = !isOpen;
+
+                    if (isOpen) {
+                        lines[0].style.transform = 'translateY(3px) rotate(45deg)';
+                        lines[1].style.opacity = '0';
+                        lines[1].style.transform = 'scaleX(0)';
+                        lines[2].style.transform = 'translateY(-3px) rotate(-45deg)';
+
+                        menu.classList.remove('opacity-0', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'pointer-events-auto');
+
+                        links.forEach((link, i) => {
+                            setTimeout(() => {
+                                link.classList.remove('opacity-0', 'translate-y-4');
+                                link.classList.add('opacity-100', 'translate-y-0');
+                            }, 100 + i * 80);
+                        });
+                    } else {
+                        lines[0].style.transform = '';
+                        lines[1].style.opacity = '';
+                        lines[1].style.transform = '';
+                        lines[2].style.transform = '';
+
+                        links.forEach(link => {
+                            link.classList.add('opacity-0', 'translate-y-4');
+                            link.classList.remove('opacity-100', 'translate-y-0');
+                        });
+
+                        setTimeout(() => {
+                            menu.classList.add('opacity-0', 'pointer-events-none');
+                            menu.classList.remove('opacity-100', 'pointer-events-auto');
+                        }, 300);
+                    }
+                });
+            })();
+        </script>
+    </div>
+</header>
+
+    <main class="flex-1 max-w-3xl mx-auto w-full px-6 sm:px-10 py-14 sm:py-20">
+
+        <!-- Back -->
+            <a href="/"
+                class="fade-in inline-flex items-center font-mono text-[11px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors mb-12">
+                ← Back
+            </a>
+            <div class="flex justify-end mb-5 mt-5">
+                <a href="{% url 'report' post.pk %}"
+                    class="font-mono text-[10px] uppercase tracking-wider border border-red-300 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1 transition-all rounded">
+                    Report this post?
+                </a>
+            </div>
+
+
+            {% block page_title %}
+            <div class="fade-in-2 mb-10">
+                <!-- Meta -->
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <time class="font-mono text-[11px] uppercase tracking-widest text-gray-400">
+                        {{ post.created_on.date }}
+                    </time>
+                    {% for category in post.categories.all %}
+                    <a href="{% url 'blog_category' category.name %}"
+                        class="font-mono text-[10px] uppercase tracking-wider border border-gray-300 hover:border-black hover:text-black px-2 py-0.5 text-gray-400 transition-all">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Title -->
+                <h1 class="font-serif text-5xl sm:text-6xl italic font-light leading-[1.05] tracking-tight">
+                    {{ post.title }}
+                </h1>
+            </div>
+
+            <!-- Hero image -->
+            {% if post.image %}
+            <div class="fade-in-3 mb-10 -mx-6 sm:-mx-10">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-64 sm:h-96 object-cover">
+            </div>
+            {% else %}
+            <div class="fade-in-3 border-t border-gray-200 mb-10"></div>
+            {% endif %}
+            {% endblock page_title %}
+
+            {% block page_content %}
+            <!-- Body -->
+            <div class="post-body fade-in-3 text-gray-700 text-lg font-light leading-relaxed">
+                {{ post.body|linebreaks }}
+            </div>
+
+            <!-- Comments -->
+            {% if comments %}
+            <section class="comment-section mt-16 pt-10 border-t border-gray-200 px-8 sm:px-12 pb-10">
+                <div class="mb-8">
+                    <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">Discussion</span>
+                    <h3 class="font-serif text-3xl italic font-light mt-1">
+                        {{ comments|length }} Comment {{ comments|length|pluralize }}
+                    </h3>
+                </div>
+
+                <div class="space-y-0">
+                    {% for comment in comments %}
+                    <div class="py-6 border-b border-gray-100 last:border-0">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="font-mono text-xs uppercase tracking-wider">{{ comment.author }}</span>
+                            <time class="font-mono text-[11px] text-gray-400">{{ comment.created_on.date }}</time>
+                        </div>
+                        <p class="text-gray-600 font-light leading-relaxed">{{ comment.body }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+            {% endblock page_content %}
+
+            <section class="mt-10 pt-10 border-t border-gray-200">
+                <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">Leave a word</span>
+                <h1 class="font-serif text-3xl italic font-light mt-1 mb-8">Share your thoughts</h1>
+                {% if user.is_authenticated %}
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-6">
+                        <label class="font-mono text-[11px] uppercase tracking-widest text-gray-400 block mb-2">
+                            Commenting as
+                        </label>
+                        <p class="font-serif text-xl tracking-wide text-black">{{ user.username }}</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="font-mono text-[11px] uppercase tracking-widest text-gray-400 block mb-3">Comment</label>
+                        <textarea name="body" rows="5" required placeholder="Write your comment here..."></textarea>
+                    </div>
+
+                    <button
+                        class="font-mono text-[12px] uppercase tracking-widest border border-black px-8 py-3 rounded-full text-black hover:bg-black hover:text-white transition-all duration-300"
+                        type="submit">
+                        Submit →
+                    </button>
+                </form>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                <p class="font-mono text-[11px] tracking-wide text-gray-400 uppercase">
+                    <a href="{% url 'login' %}" class="text-black hover:opacity-40 transition-opacity">Login</a> to comment →
+                </p>
+                {% endif %}
+            </section>
+
+    </main>
+
+    <footer class="border-t border-black mt-auto">
+        <div class="max-w-6xl mx-auto px-6 sm:px-10 py-5 flex items-center justify-between">
+            <span class="font-serif italic text-sm text-gray-400">Text with AX</span>
+            <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">Pyblog made with Django</span>
+        </div>
+    </footer>
+
+</body>
+
+</html>

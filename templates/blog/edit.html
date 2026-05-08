@@ -1,0 +1,293 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        mono: ['"IBM Plex Mono"', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=IBM+Plex+Mono:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes scale-x {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-wrap {
+            animation: up 0.35s ease both;
+            animation-delay: 0.05s;
+        }
+
+        input, textarea, select {
+            outline: none;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 0.5rem 0;
+            font-family: inherit;
+            font-size: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: black;
+        }
+    </style>
+    <title>Edit Post — Pyblog</title>
+</head>
+
+<body class="bg-white text-black min-h-screen flex flex-col">
+
+    <header class="border-b border-black relative overflow-hidden">
+    <!-- Animated top line -->
+    <div class="absolute top-0 left-0 w-full h-px bg-black origin-left scale-x-0 animate-[scale-x_0.8s_ease-out_forwards]"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-5 flex items-center justify-between relative z-10">
+        <!-- Logo with hover slide -->
+        <a href="/" class="font-serif text-xl italic font-light group relative overflow-hidden inline-block h-[1.2em]">
+            <span class="inline-block transition-transform duration-500 group-hover:-translate-y-full">Pyblog</span>
+            <span class="absolute left-0 top-full inline-block transition-transform duration-500 group-hover:-translate-y-full text-gray-400">Pyblog</span>
+        </a>
+
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="{% url 'blog_index' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Home</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Home</span>
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Profile</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Profile</span>
+            </a>
+            <a href="{% url 'blog_create' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">New Post</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">New Post</span>
+            </a>
+            <a href="{% url 'logout' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Logout</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Logout</span>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Login</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Login</span>
+            </a>
+            <a href="{% url 'register' %}"
+                class="font-mono text-[11px] tracking-widest uppercase relative overflow-hidden group inline-block h-[1.2em]">
+                <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">Register</span>
+                <span class="absolute left-0 top-full inline-block transition-transform duration-300 group-hover:-translate-y-full text-gray-400">Register</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <!-- Mobile hamburger button -->
+        <button id="menu-toggle" class="md:hidden flex flex-col gap-1.5 p-2 relative z-50" aria-label="Toggle menu">
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300"></span>
+            <span class="hamburger-line block w-5 h-px bg-current transition-all duration-300 origin-center"></span>
+        </button>
+
+        <!-- Mobile dropdown -->
+        <nav id="mobile-menu"
+            class="md:hidden fixed inset-0 top-[61px] bg-white/95 backdrop-blur-sm border-t border-black/10 flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-500 z-40">
+            <a href="{% url 'blog_index' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Home</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Profile</a>
+            <a href="{% url 'blog_create' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">New Post</a>
+            <a href="{% url 'logout' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Login</a>
+            <a href="{% url 'register' %}"
+                class="mobile-nav-link font-mono text-sm tracking-widest uppercase opacity-0 translate-y-4 transition-all duration-300 hover:opacity-40">Register</a>
+            {% endif %}
+        </nav>
+
+        <script>
+            (function() {
+                const toggle = document.getElementById('menu-toggle');
+                const menu = document.getElementById('mobile-menu');
+                const lines = toggle.querySelectorAll('.hamburger-line');
+                const links = menu.querySelectorAll('.mobile-nav-link');
+                let isOpen = false;
+
+                toggle.addEventListener('click', () => {
+                    isOpen = !isOpen;
+
+                    if (isOpen) {
+                        lines[0].style.transform = 'translateY(3px) rotate(45deg)';
+                        lines[1].style.opacity = '0';
+                        lines[1].style.transform = 'scaleX(0)';
+                        lines[2].style.transform = 'translateY(-3px) rotate(-45deg)';
+
+                        menu.classList.remove('opacity-0', 'pointer-events-none');
+                        menu.classList.add('opacity-100', 'pointer-events-auto');
+
+                        links.forEach((link, i) => {
+                            setTimeout(() => {
+                                link.classList.remove('opacity-0', 'translate-y-4');
+                                link.classList.add('opacity-100', 'translate-y-0');
+                            }, 100 + i * 80);
+                        });
+                    } else {
+                        lines[0].style.transform = '';
+                        lines[1].style.opacity = '';
+                        lines[1].style.transform = '';
+                        lines[2].style.transform = '';
+
+                        links.forEach(link => {
+                            link.classList.add('opacity-0', 'translate-y-4');
+                            link.classList.remove('opacity-100', 'translate-y-0');
+                        });
+
+                        setTimeout(() => {
+                            menu.classList.add('opacity-0', 'pointer-events-none');
+                            menu.classList.remove('opacity-100', 'pointer-events-auto');
+                        }, 300);
+                    }
+                });
+            })();
+        </script>
+    </div>
+</header>
+
+    <main class="flex-1 max-w-6xl mx-auto w-full px-6 sm:px-10">
+        <div
+            class="py-14 sm:py-20 border-b border-black flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <h1 class="font-serif text-6xl sm:text-8xl italic font-light leading-[0.9] tracking-tight">
+                Edit<br>Post
+            </h1>
+            <span class="font-mono text-xs text-gray-400 max-w-xs text-right truncate">{{ post.title }}</span>
+        </div>
+
+        <div class="form-wrap max-w-2xl py-14 sm:py-20">
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                class="mb-8 font-mono text-[11px] tracking-wide uppercase border px-4 py-3
+                        {% if message.tags == 'success' %}border-black text-black{% else %}border-red-400 text-red-500{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="space-y-10">
+                {% csrf_token %}
+
+                <!-- Title -->
+                <div>
+                    <label for="title"
+                        class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">Title</label>
+                    <input type="text" name="title" id="title" value="{{ post.title }}" required
+                        class="w-full border-b border-gray-200 focus:border-black py-2 font-serif text-2xl italic font-light bg-transparent placeholder-gray-300">
+                </div>
+
+                <!-- Body -->
+                <div>
+                    <label for="body"
+                        class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">Content</label>
+                    <textarea name="body" id="body" rows="12" required
+                        class="w-full border-b border-gray-200 focus:border-black py-2 font-mono text-sm font-light bg-transparent resize-none leading-relaxed">{{ post.body }}</textarea>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <span
+                        class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-4">Categories</span>
+                    <div class="flex flex-wrap gap-3">
+                        {% for category in categories %}
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="categories" value="{{ category.id }}" {% if category in
+                                post.categories.all %}checked{% endif %}
+                                class="appearance-none w-3 h-3 border border-gray-300 checked:bg-black checked:border-black transition-colors cursor-pointer">
+                            <span
+                                class="font-mono text-[11px] uppercase tracking-wider text-gray-400 group-hover:text-black transition-colors">{{
+                                category.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div>
+                    <label for="image"
+                        class="block font-mono text-[11px] tracking-widest uppercase text-gray-400 mb-3">Featured Image
+                        <span class="text-gray-300 normal-case tracking-normal">(optional)</span></label>
+                    {% if post.image %}
+                    <div class="mb-4">
+                        <img src="{{ post.image.url }}" alt="Current image"
+                            class="w-32 h-20 object-cover border border-gray-200">
+                        <p class="mt-1 font-mono text-[10px] text-gray-300 uppercase tracking-wide">Current image</p>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="image" id="image"
+                        class="font-mono text-[11px] text-gray-400 file:mr-4 file:font-mono file:text-[11px] file:uppercase file:tracking-widest file:border file:border-black file:bg-white file:text-black file:px-4 file:py-2 file:cursor-pointer hover:file:bg-black hover:file:text-white file:transition-colors">
+                    <p class="mt-2 font-mono text-[10px] text-gray-300 uppercase tracking-wide">JPG, PNG, GIF</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-8 pt-2 border-t border-gray-100">
+                    <button type="submit"
+                        class="font-mono text-[11px] tracking-widest uppercase border border-black px-8 py-3 hover:bg-black hover:text-white transition-colors duration-200">
+                        Update →
+                    </button>
+                    <a href="{% url 'blog_detail' post.pk %}"
+                        class="font-mono text-[11px] tracking-widest uppercase text-gray-400 hover:text-black transition-colors">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="border-t border-black mt-auto">
+        <div class="max-w-6xl mx-auto px-6 sm:px-10 py-5 flex items-center justify-between">
+            <span class="font-serif italic text-sm text-gray-400">Text with AX</span>
+            <span class="font-mono text-[11px] uppercase tracking-widest text-gray-400">Pyblog made with Django</span>
+        </div>
+    </footer>
+
+</body>
+
+</html>
